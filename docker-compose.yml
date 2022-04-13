@@ -3,6 +3,7 @@ version: '3'
 services:
   iris-web:
     build: .
+    hostname: iris
     ports:
       - "16649:16649"
     environment:
@@ -11,9 +12,53 @@ services:
       - IRIS_CFG_DB_PASSWORD=1234
     volumes:
       - ./configs/config.dev.yaml:/home/iris/config/config.yaml
+    depends_on:
+      - iris-mysql
+    networks:
+      - iris
+      - oncall
 
   iris-mysql:
     image: mysql:5.5
     hostname: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=1234
+    networks:
+      - iris
+
+  iris-sender:
+    build: .
+    hostname: irissender
+    command: /home/iris/env/bin/iris-sender /home/iris/config/config.yaml
+    ports:
+      - "2321:2321"
+    environment:
+      - IRIS_CFG_DB_HOST=mysql
+      - IRIS_CFG_DB_PASSWORD=1234
+    volumes:
+      - ./configs/config.dev.yaml:/home/iris/config/config.yaml
+    depends_on:
+      - iris-mysql
+      - iris-web
+    networks:
+      - iris
+
+  iris-sync-targets:
+    build: .
+    command: /home/iris/env/bin/iris-sync-targets /home/iris/config/config.yaml
+    environment:
+      - IRIS_CFG_DB_HOST=mysql
+      - IRIS_CFG_DB_PASSWORD=1234
+    volumes:
+      - ./configs/config.dev.yaml:/home/iris/config/config.yaml
+    depends_on:
+      - iris-mysql
+      - iris-web
+    networks:
+      - iris
+
+networks:
+  iris:
+    name: iris
+  oncall:
+    name: oncall
