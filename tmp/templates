@@ -1,0 +1,83 @@
+Context template
+================
+
+{{#context}}
+  <div style="text-align: left;">
+    <h2><strong>{{groupKey}}</strong></h2>
+    {{#if commonAnnotations.description}}
+      <p><b>{{commonAnnotations.description}}<b><p>
+    {{else}}
+      <p>This alert does not have a description.</p>
+    {{/if}}
+    <h4><strong>Actions to take</strong></h4>
+    <p>1. Claim the alert (top right of this page) to prevent further pages. Re-escalate to continue paging.</p>
+    <p>2. View the runbook for detailed guidance on this particular alert.</p>
+    <h4><strong>Links</strong></h4>
+    {{#if externalURL}}
+      <p><a href="{{externalURL}}" style="margin-right: 10px;">View alert in AlertManager</a></p>
+    {{/if}}
+    {{#if commonAnnotations.runbook_url}}
+      <p><a href="{{commonAnnotations.runbook_url}}">View Runbook</a></p>
+    {{/if}}
+    <h4><strong>Context</strong></h4>
+    {{#if groupLabels}}
+      <ul>
+        {{#each groupLabels}}
+          <li><span>{{@key}}: {{this}}</span></li>
+        {{/each}}
+      </ul>
+    {{/if}}
+  </div>
+{{/context}}
+
+Summary template
+================
+
+{{#context}}
+<h3><strong>{{groupKey}}</strong></h3>
+<ul>
+  <li><strong>Status</strong>: {{status}}</li>
+  <li><strong>Severity</strong>: {{groupLabels.severity}}</li>
+  <li><small><span class="light">Labels:</span> {{#each groupLabels}} {{@key}}: {{this}} {{/each}}</small></li>
+</ul>
+{{/context}}
+
+Example context
+===============
+{
+  "version": "4",
+  "groupKey": "demo_system_down",
+  "truncatedAlerts": 3,
+  "status": "firing",
+  "receiver": "alertmanager",
+  "groupLabels": {"iris_plan": "do-nothing", "severity":"critical", "service":"unimportant-demo-system"},
+  "commonLabels": {"iris_plan": "do-nothing", "severity":"critical", "service":"unimportant-demo-system"},
+  "commonAnnotations": {"team":"infra", "runbook_url": "https://example.org", "description": "The service is down!"},
+  "externalURL": "https://alertmanager.example.org",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {"iris_plan": "do-nothing", "severity":"critical", "service":"unimportant-demo-system"},
+      "annotations": {"runbook_url": "https://example.org", "description": "The service is down!"},
+      "startsAt": "2022-04-14T07:20:50.52Z",
+      "endsAt": "2022-04-14T19:20:50.52Z",
+      "generatorURL": "https://alertmanager.example.org",
+      "fingerprint": "123456789"
+    }
+  ]
+}
+
+Message templates
+=================
+
+Call:
+Fault {{groupKey}} impacting service {{groupLabels.service}}. Severity level {{groupLabels.severity}}.
+SMS:
+Fault {{groupKey}} impacting service {{groupLabels.service}}. Severity level {{groupLabels.severity}}.
+Email
+Subject:
+[iris][{{groupLabels.service}}][{{groupLabels.severity}}]: {{groupKey}}
+Fault {{groupKey}} impacting service {{groupLabels.service}}. Severity level {{groupLabels.severity}}.
+Description: {{groupLabels.description}}
+Runbook: {{groupLabels.runbook_url}}
+Go to Iris to claim the alert or this alert may be escalated to others.
