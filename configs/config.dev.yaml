@@ -179,8 +179,8 @@ role_lookups:
   #- oncall # oncall service integration
   - dummy # dummy role lookup used for testing purposes. Disable this in production.
 
-oncall-api: http://localhost:8080  # oncall url
-oncall-app: app # application for oncall auth
+oncall-api: http://oncall:8080  # oncall url
+oncall-app: oncall # application for oncall auth
 oncall-key: abc # API key for oncall auth
 
 applications:
@@ -212,13 +212,15 @@ vendors: []
 #    color: 'danger'
 #    pretext: '<!here> _Iris_ _Alert!_'
 
-#- type: iris_twilio
+# - type: iris_twilio
 #  name: twilio_1
 #  account_sid: ''
 #  auth_token: ''
 #  twilio_number: ''
 #  application_override_mapping: ''
-#  relay_base_url: ''
+#  relay_base_url: 'https://handler.twilio.com/twiml/<handler>'
+#  say_endpoint: ''
+#  gather_endpoint: ''
 
 ## Hipchat support requires adding a new mode called "hipchat", in iris' mode table
 ## Also, uncomment the hipchat workers to the sender['workers_per_mode'] hash above
